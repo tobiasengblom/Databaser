@@ -1,5 +1,5 @@
--- \i tables.sql
--- \i inserts.sql
+\i tables.sql
+\i inserts.sql
 
 CREATE VIEW BasicInformation AS
   (SELECT DISTINCT idnr, Students.name, login, Students.program, branch
@@ -173,5 +173,6 @@ LEFT OUTER JOIN ResearchCredits ON ResearchCredits.student = StudentID.student
 LEFT OUTER JOIN SeminarCourses ON SeminarCourses.student = StudentID.student
 LEFT OUTER JOIN IsQualified ON IsQualified.student = StudentID.student;
 -- SELECT student, totalCredits, mandatoryleft, mathCredits, researchCredits, seminarCourses, qualified FROM PathToGraduation ORDER BY student;
+	
 		  
 		  	

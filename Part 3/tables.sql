@@ -1,5 +1,5 @@
 -- psql -v ON_ERROR_STOP=1 -U postgres portal
-/*
+
 \c portal
 \set QUIT true
 SET client_min_messages TO WARNING;
@@ -7,7 +7,6 @@ DROP SCHEMA public CASCADE;
 CREATE SCHEMA public;
 GRANT ALL ON SCHEMA public TO postgres;
 \set QUIET false
-*/
 
 CREATE TABLE Programs (
 	name TEXT PRIMARY KEY,
