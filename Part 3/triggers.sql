@@ -9,6 +9,7 @@ DECLARE nrStudents INT;
 DECLARE	maxCapacity INT;
 DECLARE nrOfPrerequisites INT;
 DECLARE nrOfPassedPrerequisites INT;
+DECLARE lastWaitingPos INT;
 BEGIN
 	IF NOT EXISTS (SELECT idnr FROM Students WHERE idnr = NEW.student)
 	THEN RAISE EXCEPTION 'Student in input does not exist';
@@ -28,17 +29,18 @@ BEGIN
 								WHERE student = NEW.student AND Prerequisite.course = NEW.course);
 		IF (nrOfPrerequisites > nrOfPassedPrerequisites)
 		THEN RAISE EXCEPTION 'Student have not passed all prerequisite courses';
-		ELSE 
-		maxCapacity := (SELECT capacity FROM LimitedCourses
-						WHERE NEW.course = course);
-		nrStudents := (SELECT COUNT (student) FROM Registered
-					   WHERE NEW.course = Registered.course);
-			IF (nrStudents >= maxCapacity)
-			THEN INSERT INTO WaitingList VALUES (NEW.student, NEW.course);
-			ELSE INSERT INTO Registered VALUES (NEW.student, NEW.course);
-			END IF;
 		END IF;
-	END IF;
+	END IF;	
+	maxCapacity := (SELECT capacity FROM LimitedCourses
+					WHERE NEW.course = course);
+	nrStudents := (SELECT COUNT (student) FROM Registered
+				   WHERE NEW.course = Registered.course);
+	IF (nrStudents >= maxCapacity)
+	THEN 
+	lastWaitingPos := (SELECT COALESCE (MAX (position), 0) FROM WaitingList WHERE WaitingList.course = NEW.course);
+	INSERT INTO WaitingList VALUES (NEW.student, NEW.course, lastWaitingPos + 1);
+	ELSE INSERT INTO Registered VALUES (NEW.student, NEW.course);
+	END IF;	
 	RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
