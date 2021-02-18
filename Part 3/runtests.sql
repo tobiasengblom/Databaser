@@ -28,6 +28,7 @@ SET client_min_messages TO NOTICE;
 \i tables.sql
 \i views.sql
 \i inserts.sql
+\i triggers.sql
 
 ------------------
 -- Test queries --

@@ -1,5 +1,5 @@
-\i tables.sql
-\i inserts.sql
+--\i tables.sql
+--\i inserts.sql
 
 CREATE VIEW BasicInformation AS
   (SELECT DISTINCT idnr, Students.name, login, Students.program, branch

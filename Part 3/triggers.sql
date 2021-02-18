@@ -12,13 +12,15 @@ BEGIN
 			   WHERE NEW.student = student AND NEW.course = course);
 	maxCapacity := (SELECT capacity FROM LimitedCourses
 			   WHERE NEW.course = course);
-	IF (newStatus = 'registered' OR newStatus = 'waiting')
-	THEN RAISE EXCEPTION 'ALREADY IN REGISTRATIONS VIEW';
+	IF NEW.student IN (SELECT Registrations.student FROM Registrations
+					   WHERE Registrations.course = NEW.course)
+	THEN RAISE EXCEPTION 'Student already registered';
 	ELSE IF (NEW.course = LimitedCourses.course AND COUNT(Registered.student) < maxCapacity)
-	THEN INSERT INTO
+	/*
 	ELSE
 		INSERT INTO Registrations 
 		VALUES (NEW.student, NEW.course, NEW.status);
+		*/
 	END IF;
 	RETURN NEW;
 END;
