@@ -45,7 +45,42 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION unregisterCourse () RETURNS TRIGGER AS $$
+BEGIN
+	IF NOT EXISTS (SELECT idnr FROM Students WHERE idnr = OLD.student)
+	THEN RAISE EXCEPTION 'Student in input does not exist';
+	ELSIF NOT EXISTS (SELECT code FROM Courses WHERE code = OLD.course)
+	THEN RAISE EXCEPTION 'Course in input does not exist';
+	END IF;
+	
+	IF NOT EXISTS (SELECT Registrations.student FROM Registrations
+				   WHERE Registrations.course = OLD.course)
+	THEN RAISE EXCEPTION 'Student not registered on this course';
+	END IF;
+	
+	IF EXISTS (SELECT student FROM WaitingList 
+			   WHERE WaitingList.student = OLD.student AND WaitingList.course = OLD.course)
+	THEN 
+	DELETE FROM WaitingList WHERE WaitingList.student = OLD.student AND WaitingList.course = OLD.course;
+	
+	ELSIF EXISTS (SELECT student FROM Registered
+				  WHERE Registered.student = OLD.student AND Registered.course = OLD.course)
+	THEN 
+	DELETE FROM Registered WHERE Registered.student = OLD.student AND Registered.course = OLD.course;
+		IF OLD.course IN (SELECT LimitedCourses.course FROM LimitedCourses)
+		THEN 
+		END IF;
+	END IF;
+	RETURN OLD;
+END;
+$$ LANGUAGE plpgsql;
+
 CREATE TRIGGER courseRegistration
 INSTEAD OF INSERT ON Registrations
 FOR EACH ROW
 EXECUTE FUNCTION registerCourse ();
+
+CREATE TRIGGER courseUnregistration
+INSTEAD OF DELETE ON Registrations
+FOR EACH ROW
+EXECUTE FUNCTION unregisterCourse ();
