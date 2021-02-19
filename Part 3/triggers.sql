@@ -55,35 +55,39 @@ BEGIN
 	THEN RAISE EXCEPTION 'Course in input does not exist';
 	END IF;
 	
-	IF NOT EXISTS (SELECT Registrations.student FROM Registrations
-				   WHERE Registrations.course = OLD.course)
+	IF NOT EXISTS (SELECT student FROM Registered
+				   WHERE student = OLD.student AND course = OLD.course
+				   UNION
+				   SELECT student FROM WaitingList
+				   WHERE student = OLD.student AND course = OLD.course) 
 	THEN RAISE EXCEPTION 'Student not registered on this course';
 	END IF;
 	
 	IF EXISTS (SELECT student FROM WaitingList 
-			   WHERE WaitingList.student = OLD.student AND WaitingList.course = OLD.course)
+			   WHERE student = OLD.student AND course = OLD.course)
 	THEN 
-	DELETE FROM WaitingList WHERE WaitingList.student = OLD.student AND WaitingList.course = OLD.course;
-	
+	DELETE FROM WaitingList WHERE student = OLD.student AND course = OLD.course;
 	ELSIF EXISTS (SELECT student FROM Registered
-				  WHERE Registered.student = OLD.student AND Registered.course = OLD.course)
+				  WHERE student = OLD.student AND course = OLD.course)
 	THEN 
-	DELETE FROM Registered WHERE Registered.student = OLD.student AND Registered.course = OLD.course;
-	maxCapacity = (SELECT capacity FROM LimitedCourses
+	DELETE FROM Registered WHERE student = OLD.student AND course = OLD.course;
+	maxCapacity := (SELECT capacity FROM LimitedCourses
 				   WHERE OLD.course = course);
-	nrStudents = (SELECT COUNT (student) FROM Registered
+	nrStudents := (SELECT COUNT (student) FROM Registered
 				  WHERE OLD.course = Registered.course);
 		IF OLD.course IN (SELECT LimitedCourses.course FROM LimitedCourses) AND
 		maxCapacity > nrStudents
 		THEN
-		registeringStudent = (SELECT student FROM CourseQueuePositions
-							   WHERE course = OLD.course AND place = 1);
-		registeringCourse = (SELECT course FROM CourseQueuePositions
-							  WHERE course = OLD.course);
-		DELETE FROM WaitingList WHERE student = registeringStudent AND course = registeringCourse;
-		INSERT INTO Registered VALUES (registeringStudent, registeringCourse);
-		ELSE
-		-- TODO
+			IF EXISTS (SELECT student FROM CourseQueuePositions
+					   WHERE course = OLD.course)
+			THEN
+			registeringStudent := (SELECT student FROM CourseQueuePositions
+								   WHERE course = OLD.course AND place = 1);
+			registeringCourse := (SELECT course FROM CourseQueuePositions
+								  WHERE course = OLD.course);
+			DELETE FROM WaitingList WHERE student = registeringStudent AND course = registeringCourse;
+			INSERT INTO Registered VALUES (registeringStudent, registeringCourse);
+			END IF;
 		END IF;
 	END IF;
 	RETURN OLD;
@@ -91,7 +95,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER courseRegistration
-INSTEAD OF INSERT ON Registrations
+INSTEAD OF INSERT OR UPDATE ON Registrations
 FOR EACH ROW
 EXECUTE FUNCTION registerCourse ();
 
