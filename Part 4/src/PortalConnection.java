@@ -19,7 +19,7 @@ public class PortalConnection {
     private Connection conn;
 
     public PortalConnection() throws SQLException, ClassNotFoundException {
-        this(DATABASE, USERNAME, PASSWORD);  
+        this(DATABASE, USERNAME, PASSWORD);
     }
 
     // Initializes the connection, no need to change anything here
@@ -33,48 +33,60 @@ public class PortalConnection {
 
 
     // Register a student on a course, returns a tiny JSON document (as a String)
-    public String register(String student, String courseCode){
-      
-      // placeholder, remove along with this comment. 
-      return "{\"success\":false, \"error\":\"Registration is not implemented yet :(\"}";
-      
-      // Here's a bit of useful code, use it or delete it 
-      // } catch (SQLException e) {
-      //    return "{\"success\":false, \"error\":\""+getError(e)+"\"}";
-      // }     
+    public String register(String student, String courseCode) {
+        try (PreparedStatement st = conn.prepareStatement("INSERT INTO Registrations VALUES (?, ?)")) {
+            st.setString(1, student);
+            st.setString(2, courseCode);
+            st.executeUpdate();
+            return "{\"success\":true}";
+            // Here's a bit of useful code, use it or delete it
+        } catch (SQLException e) {
+            return "{\"success\":false, \"error\":\"" + getError(e) + "\"}";
+        }
     }
 
     // Unregister a student from a course, returns a tiny JSON document (as a String)
-    public String unregister(String student, String courseCode){
-      return "{\"success\":false, \"error\":\"Unregistration is not implemented yet :(\"}";
+    public String unregister(String student, String courseCode) {
+        try (PreparedStatement st = conn.prepareStatement("DELETE FROM Registrations WHERE student = ? AND course = ?")) {
+            st.setString(1, student);
+            st.setString(2, courseCode);
+            int r = st.executeUpdate();
+            if (r > 0) {
+                return "{\"success\":true}";
+            } else {
+                return "{\"success\":false, \"error\":\" Student is not registered/waiting \"}";
+            }
+        } catch (SQLException e) {
+            return "{\"success\":false, \"error\":\"" + getError(e) + "\"}";
+        }
     }
 
     // Return a JSON document containing lots of information about a student, it should validate against the schema found in information_schema.json
-    public String getInfo(String student) throws SQLException{
-        
-        try(PreparedStatement st = conn.prepareStatement(
-            // replace this with something more useful
-            "SELECT jsonb_build_object('student',idnr,'name',name) AS jsondata FROM BasicInformation WHERE idnr=?"
-            );){
-            
+    public String getInfo(String student) throws SQLException {
+
+        try (PreparedStatement st = conn.prepareStatement(
+                // replace this with something more useful
+                "SELECT jsonb_build_object('student',idnr,'name',name) AS jsondata FROM BasicInformation WHERE idnr=?"
+        );) {
+
             st.setString(1, student);
-            
+
             ResultSet rs = st.executeQuery();
-            
-            if(rs.next())
-              return rs.getString("jsondata");
+
+            if (rs.next())
+                return rs.getString("jsondata");
             else
-              return "{\"student\":\"does not exist :(\"}"; 
-            
-        } 
+                return "{\"student\":\"does not exist :(\"}";
+
+        }
     }
 
     // This is a hack to turn an SQLException into a JSON string error message. No need to change.
-    public static String getError(SQLException e){
-       String message = e.getMessage();
-       int ix = message.indexOf('\n');
-       if (ix > 0) message = message.substring(0, ix);
-       message = message.replace("\"","\\\"");
-       return message;
+    public static String getError(SQLException e) {
+        String message = e.getMessage();
+        int ix = message.indexOf('\n');
+        if (ix > 0) message = message.substring(0, ix);
+        message = message.replace("\"", "\\\"");
+        return message;
     }
 }

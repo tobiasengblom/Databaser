@@ -137,7 +137,7 @@ public class PortalServer {
                "                    let result = `<h2>Registration result</h2>`;\n" +
                "                   \n" +
                "                    if(data.success){\n" +
-               "                      result += \"Registration sucessful!\";                  \n" +
+               "                      result += \"Registration successful!\";                  \n" +
                "                    } else {\n" +
                "                      result += `Registration failed! Error: ${data.error}`;                  \n" +
                "                    }\n" +
@@ -158,7 +158,7 @@ public class PortalServer {
                "                    let result = `<h2>Unregistration result</h2>`;\n" +
                "                   \n" +
                "                    if(data.success){\n" +
-               "                      result += \"Unregistration sucessful!\";                  \n" +
+               "                      result += \"Unregistration successful!\";                  \n" +
                "                    } else {\n" +
                "                      result += `Unregistration failed! Error: ${data.error}`;                  \n" +
                "                    }\n" +

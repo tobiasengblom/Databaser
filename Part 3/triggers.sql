@@ -84,7 +84,7 @@ BEGIN
 			registeringStudent := (SELECT student FROM CourseQueuePositions
 								   WHERE course = OLD.course AND place = 1);
 			registeringCourse := (SELECT course FROM CourseQueuePositions
-								  WHERE course = OLD.course);
+								  WHERE course = OLD.course AND place = 1);
 			DELETE FROM WaitingList WHERE student = registeringStudent AND course = registeringCourse;
 			INSERT INTO Registered VALUES (registeringStudent, registeringCourse);
 			END IF;
