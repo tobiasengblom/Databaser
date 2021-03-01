@@ -27,39 +27,31 @@ SELECT jsonb_build_object(
 'login', login, 
 'program', program, 
 'branch', branch,
-'finished', jsonb_agg (jsonb_build_object ('course', FinishedCoursesWithNames.name, 'code', FinishedCoursesWithNames.course, 'credits', FinishedCoursesWithNames.credits, 'grade', FinishedCoursesWithNames.grade)),
-'registered', jsonb_agg (jsonb_build_object ('course', RegistrationsWithNames.name, 'code', RegistrationsWithNames.course, 'status', status)),
-'seminarCourses', nrCourses,
-'mathCredits', PassedMathCourses.credits,
-'researchCredits', PassedResearchCourses.credits,
-'totalCredits', totalCredits,
-'canGraduate', qualified) 
+'finished', (SELECT jsonb_agg (jsonb_build_object (
+			'course', FinishedCoursesWithNames.name, 
+			'code', FinishedCoursesWithNames.course, 
+			'credits', FinishedCoursesWithNames.credits, 
+			'grade', FinishedCoursesWithNames.grade)) 
+			FROM FinishedCoursesWithNames WHERE student = BasicInformation.idnr),
+'registered', (SELECT jsonb_agg (jsonb_build_object (
+			'course', RegistrationsWithNames.name, 
+			'code', RegistrationsWithNames.course, 
+			'status', status)) 
+			FROM RegistrationsWithNames WHERE student = BasicInformation.idnr),
+'seminarCourses', (SELECT seminarCourses FROM PathToGraduation WHERE student = BasicInformation.idnr),
+'mathCredits', (SELECT mathCredits FROM PathToGraduation WHERE student = BasicInformation.idnr),
+'researchCredits', (SELECT researchCredits FROM PathToGraduation WHERE student = BasicInformation.idnr),
+'totalCredits', (SELECT totalCredits FROM PathToGraduation WHERE student = BasicInformation.idnr),
+'canGraduate', (SELECT qualified FROM PathToGraduation WHERE student = BasicInformation.idnr)) 
 AS 
 jsondata 
 FROM 
-BasicInformation, 
-FinishedCoursesWithNames, 
-RegistrationsWithNames, 
-PassedSeminarCourses, 
-PassedMathCourses, 
-PassedResearchCourses, 
-PathToGraduation
+BasicInformation
 WHERE 
-idnr = '2222222222' AND
-idnr = FinishedCoursesWithNames.student AND
-idnr = RegistrationsWithNames.student AND
-idnr = PassedSeminarCourses.student AND
-idnr = PassedMathCourses.student AND
-idnr = PassedResearchCourses.student AND 
-idnr = PathToGraduation.student
+idnr = '2222222222'
 GROUP BY 
 idnr, 
 BasicInformation.name, 
 login, 
 program, 
-branch, 
-nrCourses, 
-PassedMathCourses.credits, 
-PassedResearchCourses.credits, 
-totalCredits,
-qualified;
+branch;
