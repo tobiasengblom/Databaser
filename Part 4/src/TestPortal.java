@@ -11,21 +11,51 @@ public class TestPortal {
    
          // Write your tests here. Add/remove calls to pause() as desired. 
          // Use println instead of prettyPrint to get more compact output (if your raw JSON is already readable)
-   
-         System.out.println(c.unregister("2222222222", "CCC333")); 
-         pause();
 
          prettyPrint(c.getInfo("2222222222")); 
          pause();
 
-         System.out.println(c.register("2222222222", "CCC333")); 
+         System.out.println(c.register("2222222222", "CCC111"));
          pause();
 
          prettyPrint(c.getInfo("2222222222"));
+         pause();
 
+         System.out.println(c.register("2222222222", "CCC111"));
+         pause();
 
+         System.out.println(c.unregister("2222222222", "CCC111"));
+         pause();
 
-      
+         prettyPrint(c.getInfo("2222222222"));
+         pause();
+
+         System.out.println(c.unregister("2222222222", "CCC111"));
+         pause();
+
+         System.out.println(c.register("2222222222", "CCC555"));
+         pause();
+
+         System.out.println(c.unregister("1111111111", "CCC333"));
+         System.out.println(c.register("1111111111", "CCC333"));
+         prettyPrint(c.getInfo("1111111111"));
+         //TODO Ask TA about position in waitingList
+         pause();
+
+         System.out.println(c.unregister("1111111111", "CCC333"));
+         System.out.println(c.register("1111111111", "CCC333"));
+         prettyPrint(c.getInfo("1111111111"));
+         //TODO Ask TA about position in waitingList
+         pause();
+
+         System.out.println(c.unregister("1111111111", "CCC777"));
+         //TODO Ask TA
+         pause();
+
+         System.out.println(c.unregister("1111111111", "x' OR 'a'='a"));
+         
+         //TODO Ask what's supposed to be submitted
+
       } catch (ClassNotFoundException e) {
          System.err.println("ERROR!\nYou do not have the Postgres JDBC driver (e.g. postgresql-42.2.18.jar) in your runtime classpath!");
       } catch (Exception e) {
