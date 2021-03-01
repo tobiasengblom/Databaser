@@ -28,9 +28,38 @@ SELECT jsonb_build_object(
 'program', program, 
 'branch', branch,
 'finished', jsonb_agg (jsonb_build_object ('course', FinishedCoursesWithNames.name, 'code', FinishedCoursesWithNames.course, 'credits', FinishedCoursesWithNames.credits, 'grade', FinishedCoursesWithNames.grade)),
-'registered', jsonb_agg (jsonb_build_object ('course', RegistrationsWithNames.name, 'code', RegistrationsWithNames.course, 'status', status))
-) AS jsondata FROM BasicInformation, FinishedCoursesWithNames, RegistrationsWithNames
-WHERE idnr = '2222222222' AND 
-FinishedCoursesWithNames.student = idnr AND
-RegistrationsWithNames.student = idnr
-GROUP BY BasicInformation.idnr, BasicInformation.name, BasicInformation.login, BasicInformation.program, BasicInformation.branch;
+'registered', jsonb_agg (jsonb_build_object ('course', RegistrationsWithNames.name, 'code', RegistrationsWithNames.course, 'status', status)),
+'seminarCourses', nrCourses,
+'mathCredits', PassedMathCourses.credits,
+'researchCredits', PassedResearchCourses.credits,
+'totalCredits', totalCredits,
+'canGraduate', qualified) 
+AS 
+jsondata 
+FROM 
+BasicInformation, 
+FinishedCoursesWithNames, 
+RegistrationsWithNames, 
+PassedSeminarCourses, 
+PassedMathCourses, 
+PassedResearchCourses, 
+PathToGraduation
+WHERE 
+idnr = '2222222222' AND
+idnr = FinishedCoursesWithNames.student AND
+idnr = RegistrationsWithNames.student AND
+idnr = PassedSeminarCourses.student AND
+idnr = PassedMathCourses.student AND
+idnr = PassedResearchCourses.student AND 
+idnr = PathToGraduation.student
+GROUP BY 
+idnr, 
+BasicInformation.name, 
+login, 
+program, 
+branch, 
+nrCourses, 
+PassedMathCourses.credits, 
+PassedResearchCourses.credits, 
+totalCredits,
+qualified;
