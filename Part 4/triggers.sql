@@ -54,7 +54,6 @@ BEGIN
 	ELSIF NOT EXISTS (SELECT code FROM Courses WHERE code = OLD.course)
 	THEN RAISE EXCEPTION 'Course in input does not exist';
 	END IF;
-	
 	IF NOT EXISTS (SELECT student FROM Registered
 				   WHERE student = OLD.student AND course = OLD.course
 				   UNION
