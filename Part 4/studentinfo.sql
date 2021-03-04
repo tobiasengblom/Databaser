@@ -1,17 +1,3 @@
-CREATE OR REPLACE VIEW FinishedCoursesWithNames AS (
-	SELECT student, Courses.name, course, grade, FinishedCourses.credits
-	FROM Courses, FinishedCourses
-	WHERE Courses.code = course
-);
-SELECT * FROM FinishedCoursesWithNames;
-
-CREATE OR REPLACE VIEW RegistrationsWithNames AS (
-	SELECT student, Courses.name, course, status
-	FROM Courses, Registrations
-	WHERE Courses.code = course
-);
-SELECT * FROM RegistrationsWithNames;
-
 SELECT jsonb_build_object(
 'student', idnr,
 'name', BasicInformation.name, 

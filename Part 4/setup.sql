@@ -280,6 +280,20 @@ CREATE VIEW PassedRecommendedCourses AS
 		  GROUP BY StudentBranches.student
 );
 
+CREATE VIEW FinishedCoursesWithNames AS (
+	SELECT student, Courses.name, course, grade, FinishedCourses.credits
+	FROM Courses, FinishedCourses
+	WHERE Courses.code = course
+);
+SELECT * FROM FinishedCoursesWithNames;
+
+CREATE VIEW RegistrationsWithNames AS (
+	SELECT student, Courses.name, course, status
+	FROM Courses, Registrations
+	WHERE Courses.code = course
+);
+SELECT * FROM RegistrationsWithNames;
+
 CREATE VIEW Qualified AS
 WITH
 	StudentID AS
