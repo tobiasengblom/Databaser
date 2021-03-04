@@ -1,12 +1,3 @@
-\c portal
-\set QUIT true
-SET client_min_messages TO WARNING;
-DROP SCHEMA public CASCADE;
-CREATE SCHEMA public;
-GRANT ALL ON SCHEMA public TO postgres;
-\set QUIET false
-\i setup.sql
-
 CREATE OR REPLACE VIEW FinishedCoursesWithNames AS (
 	SELECT student, Courses.name, course, grade, FinishedCourses.credits
 	FROM Courses, FinishedCourses

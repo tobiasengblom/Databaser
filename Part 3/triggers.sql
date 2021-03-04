@@ -49,20 +49,6 @@ DECLARE registeringCourse CHAR(6);
 DECLARE nrStudents INT;
 DECLARE	maxCapacity INT;
 BEGIN
-	IF NOT EXISTS (SELECT idnr FROM Students WHERE idnr = OLD.student)
-	THEN RAISE EXCEPTION 'Student in input does not exist';
-	ELSIF NOT EXISTS (SELECT code FROM Courses WHERE code = OLD.course)
-	THEN RAISE EXCEPTION 'Course in input does not exist';
-	END IF;
-	
-	IF NOT EXISTS (SELECT student FROM Registered
-				   WHERE student = OLD.student AND course = OLD.course
-				   UNION
-				   SELECT student FROM WaitingList
-				   WHERE student = OLD.student AND course = OLD.course) 
-	THEN RAISE EXCEPTION 'Student not registered on this course';
-	END IF;
-	
 	IF EXISTS (SELECT student FROM WaitingList 
 			   WHERE student = OLD.student AND course = OLD.course)
 	THEN 
